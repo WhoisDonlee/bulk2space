@@ -1,0 +1,123 @@
+---
+title: Demonstration of Bulk2Space on demo1 dataset
+format: html
+execute:
+    cache: true
+jupyter: python3
+---
+
+
+
+### Import Bulk2Space
+
+```{python}
+#| pycharm: {name: "#%%\n"}
+#| label: Import Bulk2Space
+from bulk2space import Bulk2Space
+model = Bulk2Space()
+```
+
+### Decompose bulk-seq data into scRNA-seq data
+
+Train β-VAE model to generate scRNA-seq data
+
+```{python}
+#| label: Decompose bulk-seq data into scRNA-seq data
+generate_sc_meta, generate_sc_data = model.train_vae_and_generate(
+    input_bulk_path='data/example_data/demo1/demo1_bulk.csv',
+    input_sc_data_path='data/example_data/demo1/demo1_sc_data.csv',
+    input_sc_meta_path='data/example_data/demo1/demo1_sc_meta.csv',
+    input_st_data_path='data/example_data/demo1/demo1_st_data.csv',
+    input_st_meta_path='data/example_data/demo1/demo1_st_meta.csv',
+    ratio_num=1,
+    top_marker_num=500,
+    gpu=0,
+    batch_size=512,
+    learning_rate=1e-4,
+    hidden_size=256,
+    epoch_num=20,
+    vae_save_dir='data/example_data/demo1/predata/save_model',
+    vae_save_name='demo1_vae',
+    generate_save_dir='data/example_data/demo1/predata/output',
+    generate_save_name='demo1')
+```
+
+```{python}
+#| label: generate sc meta
+generate_sc_meta
+```
+
+```{python}
+#| label: generate sc data
+generate_sc_data
+```
+
+Load trained β-VAE model to generate scRNA-seq data
+
+```{python}
+#| label: Load trained model to generate scRNA-seq data
+generate_sc_meta, generate_sc_data = model.load_vae_and_generate(
+    input_bulk_path='data/example_data/demo1/demo1_bulk.csv',
+    input_sc_data_path='data/example_data/demo1/demo1_sc_data.csv',
+    input_sc_meta_path='data/example_data/demo1/demo1_sc_meta.csv',
+    input_st_data_path='data/example_data/demo1/demo1_st_data.csv',
+    input_st_meta_path='data/example_data/demo1/demo1_st_meta.csv',
+    vae_load_dir='data/example_data/demo1/predata/save_model/demo1_vae.pth',
+    generate_save_dir='data/example_data/demo1/predata/output', 
+    generate_save_name='demo1_new',
+    ratio_num=1,
+    top_marker_num=500)
+```
+
+### Decompose spatial barcoding-based spatial transcriptomics data into spatially resolved single-cell transcriptomics data
+
+Train deep-forest model to generate spatially resolved single-cell transcriptomics data
+
+```{python}
+#| label: Train deep-forest model
+df_meta, df_data = model.train_df_and_spatial_deconvolution(
+    generate_sc_meta,
+    generate_sc_data,
+    input_st_data_path='data/example_data/demo1/demo1_st_data.csv',
+    input_st_meta_path='data/example_data/demo1/demo1_st_meta.csv',
+    spot_num=500,
+    cell_num=10,
+    df_save_dir='data/example_data/demo1/predata/save_model/',
+    df_save_name='deom1_df',
+    map_save_dir='data/example_data/demo1/result', 
+    map_save_name='demo1',
+    top_marker_num=500,
+    marker_used=True,
+    k=10)
+```
+
+```{python}
+#| label: df meta
+df_meta
+```
+
+```{python}
+#| label: df data
+df_data
+```
+
+Load trained deep-forest model to generate spatially resolved single-cell transcriptomics data
+
+```{python}
+#| label: load trained deep-forest model
+df_meta, df_data = model.load_df_and_spatial_deconvolution(
+    generate_sc_meta,
+    generate_sc_data,
+    input_st_data_path='data/example_data/demo1/demo1_st_data.csv',
+    input_st_meta_path='data/example_data/demo1/demo1_st_meta.csv',
+    spot_num=500,
+    cell_num=10,
+    df_load_dir='data/example_data/demo1/predata/save_model/deom1_df',
+    map_save_dir='data/example_data/demo1/result',  # file_dir
+    map_save_name='demo1_new',  # file_name
+    top_marker_num=500,
+    marker_used=True,
+    k=10)
+```
+
+

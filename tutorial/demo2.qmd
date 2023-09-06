@@ -1,0 +1,82 @@
+---
+title: Demonstration of Bulk2Space on demo2 dataset
+format: html
+execute:
+    cache: true
+jupyter: python3
+---
+
+### Import Bulk2Space
+
+```{python}
+from bulk2space import Bulk2Space
+model = Bulk2Space()
+```
+
+### Decompose bulk-seq data into scRNA-seq data
+
+Train β-VAE model to generate scRNA-seq data
+
+```{python}
+generate_sc_meta, generate_sc_data = model.train_vae_and_generate(
+    input_bulk_path='data/example_data/demo2/demo2_bulk.csv',
+    input_sc_data_path='data/example_data/demo2/demo2_sc_data.csv',
+    input_sc_meta_path='data/example_data/demo2/demo2_sc_meta.csv',
+    input_st_data_path='data/example_data/demo2/demo2_st_data.csv',
+    input_st_meta_path='data/example_data/demo2/demo2_st_meta.csv',
+    ratio_num=1,
+    top_marker_num=500,
+    gpu=0,
+    batch_size=512,
+    learning_rate=1e-4,
+    hidden_size=256,
+    epoch_num=20,
+    vae_save_dir='data/example_data/demo2/predata/save_model',
+    vae_save_name='demo2_vae',
+    generate_save_dir='data/example_data/demo2/predata/output',
+    generate_save_name='demo2')
+```
+
+```{python}
+generate_sc_meta
+```
+
+```{python}
+generate_sc_data
+```
+
+Load trained β-VAE model to generate scRNA-seq data
+
+```{python}
+generate_sc_meta, generate_sc_data = model.load_vae_and_generate(
+    input_bulk_path='data/example_data/demo2/demo2_bulk.csv',
+    input_sc_data_path='data/example_data/demo2/demo2_sc_data.csv',
+    input_sc_meta_path='data/example_data/demo2/demo2_sc_meta.csv',
+    input_st_data_path='data/example_data/demo2/demo2_st_data.csv',
+    input_st_meta_path='data/example_data/demo2/demo2_st_meta.csv',
+    vae_load_dir='data/example_data/demo2/predata/save_model/demo2_vae.pth',
+    generate_save_dir='data/example_data/demo2/predata/output', 
+    generate_save_name='demo2_new',
+    ratio_num=1,
+    top_marker_num=500)
+```
+
+### Map image-based spatial transcriptomics data into spatially resolved single-cell transcriptomics data
+
+```{python}
+df_meta, df_data = model.spatial_mapping(
+    generate_sc_meta,
+    generate_sc_data,
+    input_st_data_path='data/example_data/demo2/demo2_st_data.csv',
+    input_st_meta_path='data/example_data/demo2/demo2_st_meta.csv')
+```
+
+```{python}
+df_meta
+```
+
+```{python}
+df_data
+```
+
+

@@ -1,4 +1,7 @@
 /build/
 /bulk2space.egg-info/
 /dist/
-/tutorial/
+/tutorial/.jupyter_cache/
+/tutorial/data/example_data/demo1/predata/
+/tutorial/data/example_data/demo1/result/
+/tutorial/demo1_files/
