@@ -17,6 +17,8 @@ The processed [PDAC bulk-seq data (GSE171485)](https://www.ncbi.nlm.nih.gov/geo/
 ### Import modules
 
 ```{python}
+#| label: Import modules
+
 import scanpy
 import pandas as pd
 import numpy as np
@@ -32,6 +34,8 @@ model = Bulk2Space()
 ### Decompose bulk-seq data into scRNA-seq data
 
 ```{python}
+#| label: Decompose bulk to single-cell
+
 generate_sc_meta, generate_sc_data = model.train_vae_and_generate(
     input_bulk_path='data/pdac/pdac_bulk.csv',
     input_sc_data_path='data/pdac/sc_data.csv',
@@ -54,6 +58,9 @@ generate_sc_meta, generate_sc_data = model.train_vae_and_generate(
 ### Plot cell type proportion of generated scRNA-seq data
 
 ```{python}
+#| label: Plot scRNA cell type proportion
+
+
 # The number of cells per cell type in deconvoluted bulk-seq data
 ct_stat = pd.DataFrame(generate_sc_meta['Cell_type'].value_counts())
 ct_name = list(ct_stat.index)
@@ -71,6 +78,9 @@ plt.show()
 ### Calculate marker genes expression correlation between scRNA-seq reference and generated scRNA-seq data
 
 ```{python}
+#| label: Calculate marker gene expression correlation
+
+
 # load input sc data
 input_data = bulk2space.utils.load_data(
     input_bulk_path='data/pdac/pdac_bulk.csv',
@@ -135,6 +145,9 @@ plt.show()
 ### Decompose ST data into spatially resolved single-cell transcriptomics data
 
 ```{python}
+#| label: Decompose ST data
+
+
 df_meta, df_data = model.train_df_and_spatial_deconvolution(
     generate_sc_meta,
     generate_sc_data,
@@ -157,6 +170,9 @@ We firstly investigate the spatial deconvolution results with single cell resolu
 The results showed that Acinar cells, Cancer cells and Ductal cells have significant spatial distribution patterns, which were consistent with their histomorphology.
 
 ```{python}
+#| label: Plot spatial deconvolution
+
+
 # Spatial mapping with single cell resolution
 ct_type = list(df_meta['Cell_type'].unique())
 color = ["#EF4444", "#10B981", '#14B8A6', "#7C3AED", '#3B82F6', '#64748B', "#D946EF", 
@@ -181,6 +197,9 @@ plt.show()
 The spatial expression patterns of marker genes were also consistent with the spatial distribution of cell types.
 
 ```{python}
+#| label: Plot spatial expression patterns
+
+
 # gene expression
 plot = df_meta
 plot.index = list(plot['Cell'])
@@ -221,6 +240,9 @@ plt.show()
 We also evaluated the spatial deconvolution results at spot-level resolution. We firstly calculated cell type proportion per spot and then aggregated gene expression of cells per spot.
 
 ```{python}
+#| label: Spot-level resolution
+
+
 # spot-level
 # calculate cell type proportion per spot
 prop = df_meta[['Cell', 'Cell_type', 'Spot']].pivot_table(index=['Spot'], columns=['Cell_type'], aggfunc='count',values = 'Cell', fill_value=0)
@@ -239,6 +261,9 @@ pred_spot_mean = pred_spot_new.groupby('Spot')[genes].mean()
 ### Plot cell type proportion per spot
 
 ```{python}
+#| label: Plot per spot cell type proportion
+
+
 # plot cell type proportion
 # Acinar cells; Cancer clone A; Cancer clone B; Ductal
 spot_x = np.array(prop['Spot_xcoord'])
@@ -273,6 +298,9 @@ plt.show()
 ### Plot gene expression per spot
 
 ```{python}
+#| label: Plot GE per spot
+
+
 # plot gene expression proportion
 # 'REG1A': Acinar cells; 'CLDN1': Cancer clone A; 'KRT16': Cancer clone B; 'MUC5B': Ductal
 spot_x = np.array(prop['Spot_xcoord'])
