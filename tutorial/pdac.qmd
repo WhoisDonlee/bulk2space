@@ -1,6 +1,10 @@
 ---
 title: Bulk2Space integrates spatial gene expression and histomorphology in pancreatic ductal adenocarcinoma (PDAC)
-format: html
+format:
+  html:
+    fig-format: svg
+    embed-resources: true
+    df-print: paged
 execute:
     cache: true
 jupyter: python3
